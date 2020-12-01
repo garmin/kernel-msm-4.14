@@ -255,6 +255,7 @@ int devfreq_suspend_devbw(struct device *dev)
 
 	return devfreq_suspend_device(d->df);
 }
+EXPORT_SYMBOL(devfreq_suspend_devbw);
 
 int devfreq_resume_devbw(struct device *dev)
 {
@@ -262,6 +263,7 @@ int devfreq_resume_devbw(struct device *dev)
 
 	return devfreq_resume_device(d->df);
 }
+EXPORT_SYMBOL(devfreq_resume_devbw);
 
 static int devfreq_devbw_probe(struct platform_device *pdev)
 {
