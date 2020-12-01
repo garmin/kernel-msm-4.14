@@ -391,6 +391,7 @@ struct qmi_elem_info qmi_uaudio_stream_req_msg_v01_ei[] = {
 		.is_array       = QMI_COMMON_TLV_TYPE,
 	},
 };
+EXPORT_SYMBOL_GPL(qmi_uaudio_stream_req_msg_v01_ei);
 
 struct qmi_elem_info qmi_uaudio_stream_resp_msg_v01_ei[] = {
 	{
@@ -694,6 +695,7 @@ struct qmi_elem_info qmi_uaudio_stream_resp_msg_v01_ei[] = {
 		.is_array       = QMI_COMMON_TLV_TYPE,
 	},
 };
+EXPORT_SYMBOL_GPL(qmi_uaudio_stream_resp_msg_v01_ei);
 
 struct qmi_elem_info qmi_uaudio_stream_ind_msg_v01_ei[] = {
 	{
@@ -905,3 +907,4 @@ struct qmi_elem_info qmi_uaudio_stream_ind_msg_v01_ei[] = {
 		.is_array       = QMI_COMMON_TLV_TYPE,
 	},
 };
+EXPORT_SYMBOL_GPL(qmi_uaudio_stream_ind_msg_v01_ei);
