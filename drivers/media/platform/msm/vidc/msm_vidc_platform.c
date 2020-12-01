@@ -921,7 +921,7 @@ static struct msm_vidc_platform_data sdm670_data = {
 	.vpu_ver = VPU_VERSION_4,
 };
 
-static const struct of_device_id msm_vidc_dt_match[] = {
+static const struct of_device_id msm_vidc_dt_match_plat[] = {
 	{
 		.compatible = "qcom,atoll-vidc",
 		.data = &atoll_data,
@@ -957,7 +957,7 @@ static const struct of_device_id msm_vidc_dt_match[] = {
 	{},
 };
 
-MODULE_DEVICE_TABLE(of, msm_vidc_dt_match);
+MODULE_DEVICE_TABLE(of, msm_vidc_dt_match_plat);
 
 static int msm_vidc_read_efuse(
 		struct msm_vidc_platform_data *data, struct device *dev)
@@ -1013,7 +1013,7 @@ void *vidc_get_drv_data(struct device *dev)
 		goto exit;
 	}
 
-	match = of_match_node(msm_vidc_dt_match, dev->of_node);
+	match = of_match_node(msm_vidc_dt_match_plat, dev->of_node);
 
 	if (match)
 		driver_data = (struct msm_vidc_platform_data *)match->data;
