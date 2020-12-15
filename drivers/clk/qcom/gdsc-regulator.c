@@ -689,6 +689,8 @@ static const struct regmap_config gdsc_regmap_config = {
 	.fast_io    = true,
 };
 
+static struct lock_class_key gdsc_reg_lock_key;
+
 static int gdsc_probe(struct platform_device *pdev)
 {
 	static atomic_t gdsc_count = ATOMIC_INIT(-1);
@@ -1019,6 +1021,9 @@ static int gdsc_probe(struct platform_device *pdev)
 		ret = PTR_ERR(sc->rdev);
 		goto err;
 	}
+
+	/* Create lockdep class to avoid false positive lock warnings */
+	lockdep_set_class(&sc->rdev->mutex, &gdsc_reg_lock_key);
 
 	return 0;
 
