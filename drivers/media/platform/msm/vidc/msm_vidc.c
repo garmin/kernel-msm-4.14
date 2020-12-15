@@ -28,6 +28,8 @@
 
 #define MAX_EVENTS 30
 
+EXPORT_TRACEPOINT_SYMBOL(msm_vidc_perf_bus_vote);
+
 static int try_get_ctrl(struct msm_vidc_inst *inst,
 	struct v4l2_ctrl *ctrl);
 
