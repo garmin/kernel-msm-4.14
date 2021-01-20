@@ -61,6 +61,8 @@ struct dp_hdcp2p2_ctrl {
 	u8 sink_rx_status;
 	u8 rx_status;
 	char abort_mask;
+	bool hdcp1_legacy_device_downstream;
+	bool hdcp2_legacy_device_downstream;
 
 	bool polling;
 };
@@ -148,8 +150,32 @@ static int dp_hdcp2p2_copy_buf(struct dp_hdcp2p2_ctrl *ctrl,
 
 static void dp_hdcp2p2_send_auth_status(struct dp_hdcp2p2_ctrl *ctrl)
 {
+	int version = HDCP_VERSION_2P2;
+	int state = atomic_read(&ctrl->auth_state);
+	if (IS_ENABLED(CONFIG_HDCP_QSEECOM))
+	{
+		if (state == HDCP_STATE_AUTHENTICATED)
+		{
+			if (ctrl->hdcp1_legacy_device_downstream)
+			{
+				pr_debug("HDCP legacy devices detected, downgrading...");
+				version = HDCP_VERSION_1X;
+			}
+			// hdcp2_legacy_device_downstream is not used since the driver doesn't support HDCP 2.3.
+		}
+		else if (state != HDCP_STATE_AUTHENTICATED)
+		{
+			ctrl->hdcp1_legacy_device_downstream = false;
+			ctrl->hdcp2_legacy_device_downstream = false;
+		}
+	}
+
+	msm_hdcp_notify_status(ctrl->init_data.msm_hdcp_dev,
+				state,
+				version);
+
 	ctrl->init_data.notify_status(ctrl->init_data.cb_data,
-		atomic_read(&ctrl->auth_state));
+		state);
 }
 
 static void dp_hdcp2p2_set_interrupts(struct dp_hdcp2p2_ctrl *ctrl, bool enable)
@@ -239,6 +265,18 @@ static int dp_hdcp2p2_wakeup(struct hdcp_transport_wakeup_data *data)
 		break;
 	case HDCP_TRANSPORT_CMD_AUTHENTICATE:
 		kthread_queue_work(&ctrl->worker, &ctrl->auth);
+		break;
+	case HDCP_TRANSPORT_CMD_RX_INFO:
+		pr_debug("RxInfo: %02x %02x", data->buf[0], data->buf[1]);
+		if (data->buf[1] & 0x2) {
+			ctrl->hdcp2_legacy_device_downstream = true;
+			pr_debug("setting hdcp2_legacy_device_downstream flag to true");
+		}
+
+		if (data->buf[1] & 0x1) {
+			ctrl->hdcp1_legacy_device_downstream = true;
+			pr_debug("setting hdcp1_legacy_device_downstream flag to true");
+		}
 		break;
 	default:
 		pr_err("invalid wakeup command %d\n", ctrl->wakeup_cmd);
